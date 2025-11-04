@@ -32,5 +32,5 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gnome-extension
+          name: ${{ basename(steps.find_zip.outputs.zip_file) }}
           path: ${{ steps.find_zip.outputs.zip_file }}
