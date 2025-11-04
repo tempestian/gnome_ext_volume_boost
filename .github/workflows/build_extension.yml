@@ -15,25 +15,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install jq
         run: |
           sudo apt update
-          sudo apt install -y make zip
+          sudo apt install -y jq
 
-      - name: Build extension
-        run: make
-
-      - name: Find built ZIP file
-        id: find_zip
+      - name: Get UUID from metadata.json
+        id: get_uuid
         run: |
-          ZIP_FILE=$(find . -type f -name "*.zip" -print -quit)
-          ZIP_NAME=$(basename "$ZIP_FILE")
-          echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
-          echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
-          echo "Found ZIP: $ZIP_NAME at $ZIP_FILE"
+          UUID=$(jq -r .uuid metadata.json)
+          echo "uuid=$UUID" >> $GITHUB_OUTPUT
 
-      - name: Upload original ZIP artifact
+      - name: Upload extension files (no zip)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.find_zip.outputs.zip_name }}
-          path: ${{ steps.find_zip.outputs.zip_file }}
+          name: ${{ steps.get_uuid.outputs.uuid }}
+          path: |
+            extension.js
+            metadata.json
