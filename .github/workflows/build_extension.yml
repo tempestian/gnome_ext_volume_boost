@@ -26,11 +26,14 @@ jobs:
       - name: Find built ZIP file
         id: find_zip
         run: |
-          ZIP_FILE=$(find . -type f -name "*.zip" | head -n 1)
+          ZIP_FILE=$(find . -type f -name "*.zip" -print -quit)
+          ZIP_NAME=$(basename "$ZIP_FILE")
           echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
+          echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
+          echo "Found ZIP: $ZIP_NAME at $ZIP_FILE"
 
-      - name: Upload build artifact
+      - name: Upload original ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ basename(steps.find_zip.outputs.zip_file) }}
+          name: ${{ steps.find_zip.outputs.zip_name }}
           path: ${{ steps.find_zip.outputs.zip_file }}
