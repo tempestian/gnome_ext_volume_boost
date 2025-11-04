@@ -1,0 +1,36 @@
+name: Build Volume Boost Extension
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y make zip
+
+      - name: Build extension
+        run: make
+
+      - name: Find built ZIP file
+        id: find_zip
+        run: |
+          ZIP_FILE=$(find . -type f -name "*.zip" | head -n 1)
+          echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gnome-extension
+          path: ${{ steps.find_zip.outputs.zip_file }}
